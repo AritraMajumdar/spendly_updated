@@ -4,12 +4,19 @@
 
 {% block content %}
 
+<section class="legal-hero">
+    <div class="legal-hero-inner">
+        <div class="hero-badge">Legal</div>
+        <h1 class="hero-title">Terms and <em>Conditions</em></h1>
+        <p class="hero-subtitle">Please read these terms carefully before using Spendly to track your expenses.</p>
+    </div>
+</section>
+
 <section class="legal-section">
     <div class="legal-container">
-        <h1 class="legal-title">Terms and Conditions</h1>
         <p class="legal-updated">Last updated: June 2026</p>
 
-        <div class="legal-body">
+        <div class="legal-card legal-body">
             <h2>1. Acceptance of Terms</h2>
             <p>By creating an account and using Spendly, you agree to be bound by these Terms and Conditions. If you do not agree, please do not use the service.</p>
 
@@ -31,6 +38,14 @@
             <h2>7. Contact</h2>
             <p>Questions about these Terms can be sent to the project maintainers.</p>
         </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="cta-inner">
+        <h2 class="cta-title">Ready to take control?</h2>
+        <p class="cta-body">Join thousands of people who track their expenses with Spendly.</p>
+        <a href="{{ url_for('register') }}" class="btn-primary">Create free account</a>
     </div>
 </section>
 
