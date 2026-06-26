@@ -15,12 +15,18 @@ Spendly is a personal expense tracker (Flask + SQLite + Jinja2 + vanilla CSS/JS)
   - `init_db()` — `CREATE TABLE IF NOT EXISTS` schema
   - `seed_db()` — sample data
 - Templates extend `base.html` and use its blocks: `title`, `head`, `content`, `scripts`.
+- `terms.html` and `privacy.html` already exist as static pages — don't recreate them.
+- `database/__init__.py` must stay (even if empty) — it makes `database` a Python package enabling `from database.db import get_db`.
+- Flask sessions require `app.secret_key`. Set it from an env var before implementing any route that calls `session` or `flash()`. `.env` is already gitignored.
+- `/login` and `/register` routes are GET-only. Auth implementation means adding `methods=['GET', 'POST']` to those existing functions, not creating new routes.
 - Currency throughout the UI is ₹ (INR).
 
 ## Conventions
 
 - Use `url_for()` for route links/redirects in templates and Python (existing `login.html`/`register.html` forms hardcode `action="/login"` etc. — don't copy that pattern for new code).
 - Login/register templates check `{% if error %}` and render an `.auth-error` div — follow this pattern when a route needs to surface a form error.
+- Page-specific CSS goes in a separate file loaded via `{% block head %}` — follow `landing.css` as the pattern. Don't put page-specific styles in `style.css`.
+- The `/expenses/<id>/delete` stub uses GET — implement it as POST with an HTML form.
 
 ## Workflow
 
