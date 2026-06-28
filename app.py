@@ -189,9 +189,54 @@ def expense_list():
     return render_template("expenses/list.html", expenses=expenses, total=total)
 
 
-@app.route("/expenses/add")
+EXPENSE_CATEGORIES = [
+    "Food", "Transport", "Bills", "Shopping", "Entertainment", "Health", "Other"
+]
+
+
+@app.route("/expenses/add", methods=["GET", "POST"])
 def add_expense():
-    return "Add expense — coming in Step 6"
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    if request.method == "GET":
+        return render_template("expenses/add.html", categories=EXPENSE_CATEGORIES)
+
+    amount      = request.form.get("amount", "").strip()
+    category    = request.form.get("category", "").strip()
+    date        = request.form.get("date", "").strip()
+    description = request.form.get("description", "").strip()
+
+    def bad(msg):
+        return render_template(
+            "expenses/add.html",
+            categories=EXPENSE_CATEGORIES,
+            error=msg,
+            form={"amount": amount, "category": category, "date": date, "description": description},
+        )
+
+    if not amount:
+        return bad("Amount is required.")
+    try:
+        amount_f = float(amount)
+        if amount_f <= 0:
+            raise ValueError
+    except ValueError:
+        return bad("Amount must be a positive number.")
+    if not category or category not in EXPENSE_CATEGORIES:
+        return bad("Please select a valid category.")
+    if not date:
+        return bad("Date is required.")
+
+    db = get_db()
+    db.execute(
+        "INSERT INTO expenses (user_id, amount, category, date, description) VALUES (?, ?, ?, ?, ?)",
+        (session["user_id"], amount_f, category, date, description),
+    )
+    db.commit()
+    db.close()
+
+    return redirect(url_for("expense_list"))
 
 
 @app.route("/expenses/<int:id>/edit")

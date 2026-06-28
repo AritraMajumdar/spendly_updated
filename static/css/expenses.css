@@ -235,6 +235,51 @@
     margin-bottom: 1.5rem;
 }
 
+/* Add / Edit form */
+
+.expense-form-wrap {
+    max-width: 560px;
+}
+
+.expense-form-error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.expense-form-error .alert-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.expense-form {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.75rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.field-optional {
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    font-weight: 400;
+}
+
+.expense-form-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
 /* Responsive */
 
 @media (max-width: 700px) {
