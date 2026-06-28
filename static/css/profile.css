@@ -1,0 +1,194 @@
+/* ------------------------------------------------------------------ */
+/* Profile page                                                        */
+/* ------------------------------------------------------------------ */
+
+.profile-hero {
+    background: var(--paper-warm);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 2rem;
+}
+
+.profile-hero-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+}
+
+.profile-hero-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--ink);
+    margin-bottom: 0.25rem;
+}
+
+.profile-hero-sub {
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* Layout                                                              */
+/* ------------------------------------------------------------------ */
+
+.profile-layout {
+    max-width: var(--max-width);
+    margin: 2rem auto;
+    padding: 0 2rem 4rem;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+/* ------------------------------------------------------------------ */
+/* Aside                                                               */
+/* ------------------------------------------------------------------ */
+
+.profile-aside {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 76px;
+}
+
+.profile-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--paper);
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 1rem;
+    box-shadow: 0 0 0 4px var(--accent-light);
+}
+
+.profile-aside-name {
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+}
+
+.profile-aside-email {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+}
+
+.profile-aside-divider {
+    height: 1px;
+    background: var(--border-soft);
+    margin: 1.25rem 0;
+}
+
+.profile-aside-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+}
+
+.meta-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Cards                                                               */
+/* ------------------------------------------------------------------ */
+
+.profile-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.profile-card {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.75rem 2rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.pcard-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.pcard-header h2 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--ink);
+    font-weight: 400;
+}
+
+.pcard-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.pcard-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.25rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Alerts                                                              */
+/* ------------------------------------------------------------------ */
+
+.profile-success {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+}
+
+.pcard-alert {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alert-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive                                                          */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 720px) {
+    .profile-layout {
+        grid-template-columns: 1fr;
+        padding: 0 1rem 3rem;
+        margin: 1.5rem auto;
+    }
+
+    .profile-aside {
+        position: static;
+    }
+}

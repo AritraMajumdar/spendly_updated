@@ -2,8 +2,8 @@ import os
 import sqlite3
 
 from dotenv import load_dotenv
-from flask import Flask, redirect, render_template, request, url_for
-from werkzeug.security import generate_password_hash
+from flask import Flask, redirect, render_template, request, session, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from database.db import get_db, init_db, seed_db
 
@@ -51,9 +51,29 @@ def register():
     return redirect(url_for("login"))
 
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    return render_template("login.html")
+    if request.method == "GET":
+        return render_template("login.html")
+
+    email    = request.form.get("email", "").strip()
+    password = request.form.get("password", "")
+
+    if not email or not password:
+        return render_template("login.html", error="Email and password are required.")
+
+    db   = get_db()
+    user = db.execute(
+        "SELECT id, name, password_hash FROM users WHERE email = ?", (email,)
+    ).fetchone()
+    db.close()
+
+    if user is None or not check_password_hash(user["password_hash"], password):
+        return render_template("login.html", error="Invalid email or password.")
+
+    session["user_id"]   = user["id"]
+    session["user_name"] = user["name"]
+    return redirect(url_for("landing"))
 
 
 @app.route("/terms")
@@ -71,14 +91,85 @@ def privacy():
 # ------------------------------------------------------------------ #
 
 
-@app.route("/logout")
+@app.route("/logout", methods=["POST"])
 def logout():
-    return "Logout — coming in Step 3"
+    session.clear()
+    return redirect(url_for("landing"))
 
 
-@app.route("/profile")
+@app.route("/profile", methods=["GET", "POST"])
 def profile():
-    return "Profile page — coming in Step 4"
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    db   = get_db()
+    user = db.execute(
+        "SELECT id, name, email, created_at FROM users WHERE id = ?",
+        (session["user_id"],),
+    ).fetchone()
+
+    if request.method == "GET":
+        db.close()
+        return render_template("profile.html", user=user)
+
+    action = request.form.get("action")
+
+    if action == "update_info":
+        name  = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip()
+        if not name or not email:
+            db.close()
+            return render_template("profile.html", user=user,
+                                   info_error="Name and email are required.")
+        try:
+            db.execute(
+                "UPDATE users SET name = ?, email = ? WHERE id = ?",
+                (name, email, session["user_id"]),
+            )
+            db.commit()
+            session["user_name"] = name
+            user = db.execute(
+                "SELECT id, name, email, created_at FROM users WHERE id = ?",
+                (session["user_id"],),
+            ).fetchone()
+            db.close()
+            return render_template("profile.html", user=user,
+                                   info_success="Profile updated.")
+        except sqlite3.IntegrityError:
+            db.close()
+            return render_template("profile.html", user=user,
+                                   info_error="That email is already in use.")
+
+    if action == "change_password":
+        current  = request.form.get("current_password", "")
+        new_pw   = request.form.get("new_password", "")
+        confirm  = request.form.get("confirm_password", "")
+        pw_row   = db.execute(
+            "SELECT password_hash FROM users WHERE id = ?", (session["user_id"],)
+        ).fetchone()
+        if not check_password_hash(pw_row["password_hash"], current):
+            db.close()
+            return render_template("profile.html", user=user,
+                                   pw_error="Current password is incorrect.")
+        if len(new_pw) < 8:
+            db.close()
+            return render_template("profile.html", user=user,
+                                   pw_error="New password must be at least 8 characters.")
+        if new_pw != confirm:
+            db.close()
+            return render_template("profile.html", user=user,
+                                   pw_error="Passwords do not match.")
+        db.execute(
+            "UPDATE users SET password_hash = ? WHERE id = ?",
+            (generate_password_hash(new_pw), session["user_id"]),
+        )
+        db.commit()
+        db.close()
+        return render_template("profile.html", user=user,
+                               pw_success="Password updated successfully.")
+
+    db.close()
+    return redirect(url_for("profile"))
 
 
 @app.route("/expenses/add")
