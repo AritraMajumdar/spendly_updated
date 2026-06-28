@@ -239,14 +239,86 @@ def add_expense():
     return redirect(url_for("expense_list"))
 
 
-@app.route("/expenses/<int:id>/edit")
+@app.route("/expenses/<int:id>/edit", methods=["GET", "POST"])
 def edit_expense(id):
-    return "Edit expense — coming in Step 8"
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    db      = get_db()
+    expense = db.execute(
+        "SELECT id, user_id, amount, category, date, description FROM expenses WHERE id = ?", (id,)
+    ).fetchone()
+
+    if expense is None:
+        db.close()
+        return "Expense not found.", 404
+    if expense["user_id"] != session["user_id"]:
+        db.close()
+        return "Forbidden.", 403
+
+    if request.method == "GET":
+        db.close()
+        return render_template("expenses/edit.html", expense=expense, categories=EXPENSE_CATEGORIES)
+
+    amount      = request.form.get("amount", "").strip()
+    category    = request.form.get("category", "").strip()
+    date        = request.form.get("date", "").strip()
+    description = request.form.get("description", "").strip()
+
+    def bad(msg):
+        return render_template(
+            "expenses/edit.html",
+            expense=expense,
+            categories=EXPENSE_CATEGORIES,
+            error=msg,
+            form={"amount": amount, "category": category, "date": date, "description": description},
+        )
+
+    if not amount:
+        return bad("Amount is required.")
+    try:
+        amount_f = float(amount)
+        if amount_f <= 0:
+            raise ValueError
+    except ValueError:
+        return bad("Amount must be a positive number.")
+    if not category or category not in EXPENSE_CATEGORIES:
+        return bad("Please select a valid category.")
+    if not date:
+        return bad("Date is required.")
+
+    db.execute(
+        "UPDATE expenses SET amount = ?, category = ?, date = ?, description = ? WHERE id = ?",
+        (amount_f, category, date, description, id),
+    )
+    db.commit()
+    db.close()
+
+    return redirect(url_for("expense_list"))
 
 
-@app.route("/expenses/<int:id>/delete")
+@app.route("/expenses/<int:id>/delete", methods=["POST"])
 def delete_expense(id):
-    return "Delete expense — coming in Step 9"
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    db      = get_db()
+    expense = db.execute(
+        "SELECT user_id FROM expenses WHERE id = ?", (id,)
+    ).fetchone()
+
+    if expense is None:
+        db.close()
+        return "Expense not found.", 404
+    if expense["user_id"] != session["user_id"]:
+        db.close()
+        return "Forbidden.", 403
+
+    db.execute("DELETE FROM expenses WHERE id = ?", (id,))
+    db.commit()
+    db.close()
+
+    return redirect(url_for("expense_list"))
 
 
 with app.app_context():
