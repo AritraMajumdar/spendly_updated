@@ -172,9 +172,26 @@ def profile():
     return redirect(url_for("profile"))
 
 
+@app.route("/expenses")
+def expense_list():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    db       = get_db()
+    expenses = db.execute(
+        "SELECT id, amount, category, date, description FROM expenses "
+        "WHERE user_id = ? ORDER BY date DESC",
+        (session["user_id"],),
+    ).fetchall()
+    total = sum(e["amount"] for e in expenses)
+    db.close()
+
+    return render_template("expenses/list.html", expenses=expenses, total=total)
+
+
 @app.route("/expenses/add")
 def add_expense():
-    return "Add expense — coming in Step 7"
+    return "Add expense — coming in Step 6"
 
 
 @app.route("/expenses/<int:id>/edit")
